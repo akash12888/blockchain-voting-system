@@ -98,12 +98,12 @@ http://localhost:3000
 
 ## 🛠️ Project Structure
 
-* 'contracts/' – Solidity smart contracts
+* `contracts/` – Solidity smart contracts
 * `migrations/` – Deployment scripts
-* 'src/' – Frontend code (HTML/JS/CSS)
-* 'test/' – Smart contract tests
-* 'node_modules/' – Installed dependencies
-* 'truffle-config.js' – Truffle configuration
+* `src/` – Frontend code (HTML/JS/CSS)
+* `test/` – Smart contract tests
+* `node_modules/` – Installed dependencies
+* `truffle-config.js` – Truffle configuration
 
 ---
 
