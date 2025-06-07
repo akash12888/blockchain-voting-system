@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transparency Dashboard | Blockchain Voting</title>
+  <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="css/landing.css" rel="stylesheet">
+  <header>
+    <div id="navbar-custom"></div>
+  </header>
+  
+</head>
+
+<body oncontextmenu="return false;">
+  <!-- Loader -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div id="loader" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-3">Loading blockchain data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content" style="display: none;">
+    <div class="container" id="dashboardPage">
+      <div class="row" id="check-web3"></div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h3 class="text-center mb-0">Election Transparency Dashboard</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i>
+            This dashboard displays all votes recorded on the blockchain. Each vote is transparent while maintaining voter anonymity.
+          </div>
+          
+          <div class="table-container">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Voter Address</th>
+                    <th scope="col">Voted Candidate</th>
+                  </tr>
+                </thead>
+                <tbody id="voterTable"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="text-center mt-4" id="no-votes" style="display: none;">
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle mr-2"></i>
+              No votes have been recorded yet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/navbar.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/truffle-contract.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    window.addEventListener("load", async function() {
+      if (typeof web3 !== "undefined") {
+        web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          App.init();
+        } catch (error) {
+          console.error("Error connecting to MetaMask:", error);
+        }
+      } else {
+        $('#check-web3').html(`<div class="alert alert-danger text-center" role="alert">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          <span>Please install MetaMask to view the dashboard.</span>
+        </div>`);
+      }
+    });
+  </script>
+</body>
+</html>

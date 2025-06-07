@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Election Results</title>
+  <link rel="shortcut icon" href="img/favicon.svg" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="css/landing.css" rel="stylesheet">
+  <style>
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .chart-container {
+      position: relative;
+      height: 350px;
+      width: 100%;
+    }
+    #resultTable {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    #resultTable th {
+      background-color: #f8f9fa;
+      padding: 12px 15px;
+      font-weight: 600;
+    }
+    #resultTable td {
+      padding: 12px 15px;
+      border-top: 1px solid #dee2e6;
+    }
+    #resultTable tr:hover {
+      background-color: rgba(0,123,255,0.05);
+    }
+    .info-card {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .info-label {
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #495057;
+      margin: 0;
+    }
+    .refresh-btn {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body oncontextmenu="return false;">
+  <!-- Navbar Header -->
+  <header>
+    <div id="navbar-custom"></div>
+  </header>
+  
+  <div id="nav-placeholder"></div>
+
+  <!-- Loader -->
+  <div class="row">
+    <div class="col-lg-12 col-sm-12 col-md-12">
+      <div id="loader" class="text-center align-middle">
+        <div class="spinner-border text-info" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content" style="display: none;">
+    <div class="container" id="resultsPage">
+      <div class="row" id="check-web3" style="margin-top: 30px;"></div>
+      
+      <h1 class="text-center my-4">Election Results</h1>
+      <p id="adminWarning" class="text-center text-danger" style="display: none;">Only admin can view election results.</p>
+      
+      <!-- Election content that should be hidden when adminWarning is shown -->
+      <div id="electionContent">
+        <!-- Summary Row -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <div class="info-card">
+              <p class="info-label">Total Votes</p>
+              <h2 class="info-value" id="totalVotes">0</h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-card">
+              <p class="info-label">Leading Candidate</p>
+              <h2 class="info-value" id="leadingCandidate">-</h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-card">
+              <p class="info-label">Leading Party</p>
+              <h2 class="info-value" id="leadingParty">-</h2>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Refresh Button -->
+        <div class="row mb-4">
+          <div class="col-12 text-center">
+            <button id="refreshResults" class="btn btn-primary refresh-btn">
+              <i class="fas fa-sync-alt mr-2"></i>Refresh Results
+            </button>
+          </div>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="row mb-4">
+          <div class="col-lg-12 col-sm-12">
+            <table class="table table-responsive table-borderless table-hover" id="resultTable" style="display: none;">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Candidate Name</th>
+                  <th>Party</th>
+                  <th>Votes</th>
+                </tr>
+              </thead>
+              <tbody id="electionResults"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Chart Row -->
+        <div class="row">
+          <!-- Pie Chart Only -->
+          <div class="col-lg-12 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Vote Distribution</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="pieChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/navbar.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+  <script src="js/web3.min.js"></script>
+  <script src="js/truffle-contract.js"></script>
+  <script src="js/app.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+      // Add event listener for admin warning visibility
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.target.id === 'adminWarning' && 
+              mutation.attributeName === 'style') {
+            // If admin warning is displayed, hide election content
+            if ($(mutation.target).is(':visible')) {
+              $('#electionContent').hide();
+            } else {
+              $('#electionContent').show();
+            }
+          }
+        });
+      });
+      
+      // Start observing the admin warning element for style changes
+      observer.observe(document.getElementById('adminWarning'), { 
+        attributes: true, 
+        attributeFilter: ['style'] 
+      });
+      
+      // Add refresh button functionality
+      $("#refreshResults").on("click", function() {
+        $("#loader").show();
+        $("#content").hide();
+        
+        // Call App.loadElectionResults with a callback to show content when done
+        App.loadElectionResults().then(function() {
+          $("#loader").hide();
+          $("#content").show();
+        }).catch(function(error) {
+          console.error("Error loading results:", error);
+          $("#loader").hide();
+          $("#content").show();
+          alert("Error loading election results. Please try again.");
+        });
+      });
+    });
+    
+    // If App.loadElectionResults doesn't support Promises, modify the original App object
+    if (typeof App !== 'undefined') {
+      // Store the original function
+      const originalLoadElectionResults = App.loadElectionResults;
+      
+      // Override with our version that ensures content is displayed after completion
+      App.loadElectionResults = function() {
+        return new Promise((resolve, reject) => {
+          try {
+            // Call the original function
+            originalLoadElectionResults();
+            
+            // Set a short timeout to ensure results have time to load
+            setTimeout(function() {
+              $("#loader").hide();
+              $("#content").show();
+              resolve();
+            }, 1000);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      };
+    }
+    
+    // This function will be called from app.js after loading election results
+    function updateResultsUI(candidateData) {
+      // Calculate total votes and find leading candidate
+      var totalVotes = 0;
+      var leadingCandidate = "-";
+      var leadingParty = "-";
+      var maxVotes = -1;
+      
+      candidateData.forEach(function(candidate) {
+        // Ensure votes is a number
+        candidate.votes = parseInt(candidate.votes || 0);
+        totalVotes += candidate.votes;
+        
+        if (candidate.votes > maxVotes) {
+          maxVotes = candidate.votes;
+          leadingCandidate = candidate.name;
+          leadingParty = candidate.party;
+        }
+      });
+      
+      // Update summary stats
+      $("#totalVotes").text(totalVotes);
+      $("#leadingCandidate").text(leadingCandidate);
+      $("#leadingParty").text(leadingParty);
+      
+      // Show result table
+      $("#resultTable").show();
+      
+      // Create the pie chart
+      createPieChart(candidateData);
+      
+      // Always hide loader and show content after processing
+      $("#loader").hide();
+      $("#content").show();
+    }
+    
+    // Create just the pie chart
+    function createPieChart(candidateData) {
+      if (!window.Chart) {
+        console.error("Chart.js not loaded");
+        return;
+      }
+      
+      // Extract data for chart
+      var labels = candidateData.map(function(candidate) {
+        return candidate.name;
+      });
+      
+      var votes = candidateData.map(function(candidate) {
+        return candidate.votes;
+      });
+      
+      // Generate colors based on party
+      var backgroundColors = [
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)'
+      ];
+      
+      // Create or update pie chart
+      var pieCtx = document.getElementById('pieChart').getContext('2d');
+      if (window.pieChartInstance) {
+        window.pieChartInstance.destroy();
+      }
+      
+      window.pieChartInstance = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: votes,
+            backgroundColor: backgroundColors,
+            borderColor: '#ffffff',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 15
+            }
+          },
+          tooltips: {
+            callbacks: {
+              label: function(tooltipItem, data) {
+                var dataset = data.datasets[tooltipItem.datasetIndex];
+                var total = dataset.data.reduce(function(previousValue, currentValue) {
+                  return previousValue + currentValue;
+                }, 0);
+                var currentValue = dataset.data[tooltipItem.index];
+                var percentage = total > 0 ? Math.round((currentValue/total) * 100) : 0;
+                return data.labels[tooltipItem.index] + ': ' + currentValue + ' votes (' + percentage + '%)';
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
